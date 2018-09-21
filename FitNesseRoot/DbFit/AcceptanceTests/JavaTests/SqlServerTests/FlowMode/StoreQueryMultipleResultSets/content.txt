@@ -1,0 +1,105 @@
+Create the procedure that has multiple result sets
+
+!|Execute Ddl|!-
+CREATE PROCEDURE [dbo].[TestStorQueryMultiResultSet]
+AS
+BEGIN
+    SELECT 1 as [One], 2 as [Two], 3 as [Three];
+
+    SELECT 4 as [Four], 5 as [Five], 6 as [Six];
+
+    -- result set that has no values
+    SELECT 7 as [Seven], 8 as [Eight], 9 as [Nine]
+    WHERE 1=0;
+
+    SELECT 10 as [Ten], 11 as [Eleven], 12 as [Twelve];
+END;
+-!|
+
+
+Test full length of result sets with a procedure that returns multiple result sets.
+
+!|Store Query Multiple Result Sets|!- EXEC dbo.TestStorQueryMultiResultSet -!|firstresultset,secondresultset,thirdresultset,fourthresultset|
+
+|Query|<<firstresultset|
+|One  |Two    |Three   |
+|1    |2      |3       |
+
+
+|Query|<<secondresultset|
+|Four |Five     |Six    |
+|4    |5        |6      |
+
+
+|Query|<<thirdresultset|
+|Seven|Eight   |Nine   |
+
+
+|Query|<<fourthresultset|
+|Ten  |Eleven  |Twelve  |
+|10   |11      |12      |
+
+
+Make sure works for variable number of symbols less than number of result sets
+
+!|Store Query Multiple Result Sets|!- EXEC dbo.TestStorQueryMultiResultSet -!|firstresultset2|
+
+
+|Query|<<firstresultset|
+|One  |Two    |Three   |
+|1    |2      |3       |
+
+
+!|Store Query Multiple Result Sets|!- EXEC dbo.TestStorQueryMultiResultSet -!|firstresultset2,secondresultset2|
+
+
+|Query|<<firstresultset2|
+|One  |Two    |Three    |
+|1    |2      |3        |
+
+
+|Query|<<secondresultset2|
+|Four |Five     |Six     |
+|4    |5        |6       |
+
+
+Test with multiple select queries.
+!|Store Query Multiple Result Sets|!-
+SELECT 1 as [One], 2 as [Two], 3 as [Three];
+
+SELECT 4 as [Four], 5 as [Five], 6 as [Six];
+-!|firstresultset3,secondresultset3|
+
+
+|Query|<<firstresultset3|
+|One  |Two    |Three    |
+|1    |2      |3        |
+
+
+|Query|<<secondresultset3|
+|Four |Five     |Six     |
+|4    |5        |6       |
+
+
+Test with multiple select queries, making sure it works for variable number of symbols less than number of result sets
+
+!|Store Query Multiple Result Sets|!-
+SELECT 1 as [One], 2 as [Two], 3 as [Three];
+SELECT 4 as [Four], 5 as [Five], 6 as [Six];
+-!|firstresultset4 |
+
+
+|Query|<<firstresultset4|
+|One  |Two    |Three    |
+|1    |2      |3        |
+
+
+Empty symbol list should not fail, just like when Store Query has empty symbol
+
+!|Store Query Multiple Result Sets|!-
+SELECT 1 as [One], 2 as [Two], 3 as [Three];
+SELECT 4 as [Four], 5 as [Five], 6 as [Six];
+-!||
+
+Drop the created procedure
+!|Execute Ddl|!-DROP PROCEDURE IF EXISTS dbo.TestStorQueryMultiResultSet;-!|

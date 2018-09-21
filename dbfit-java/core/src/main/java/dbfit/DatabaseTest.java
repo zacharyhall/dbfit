@@ -160,4 +160,8 @@ public class DatabaseTest extends Fixture {
     public Fixture setOption(String option, String value) {
         return new dbfit.fixture.SetOption(environment, option, value);
     }
+
+    public Fixture storeQueryMultipleResultSets(String query, String[] symbols) {
+        return new dbfit.fixture.StoreQuery(environment, query, symbols);
+    }
 }
